@@ -161,7 +161,8 @@ class RADIUSBackend(object):
                     is_staff = True
                     is_superuser = True
                 else:
-                    logging.warning("RADIUS Attribute Class contains unknown role '%s'. Only roles 'staff' and 'superuser' are allowed" % cl)
+                    logging.warning("RADIUS Attribute Class contains unknown role '%s'. Only roles 'staff', "
+                                    "'su-staff' and 'superuser' are allowed" % cl)
         return groups, is_staff, is_superuser
 
     def _radius_auth(self, server, username, password):
