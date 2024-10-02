@@ -146,23 +146,27 @@ class RADIUSBackend(object):
         role_class_prefix = app_class_prefix + "role="
 
         for cl in reply['Class']:
-            cl = cl.decode("utf-8")
-            if cl.lower().find(group_class_prefix) == 0:
-                groups.append(cl[len(group_class_prefix):])
-            elif cl.lower().find(role_class_prefix) == 0:
-                role = cl[len(role_class_prefix):]
-                if role == "staff":
-                    is_staff = True
-                elif role == "superuser":
-                    is_superuser = True
-                # Passing "su-staff" through the Class attribute from the RADIUS server
-                # will set both staff and superuser to true for the user.
-                elif role == "su-staff":
-                    is_staff = True
-                    is_superuser = True
-                else:
-                    logging.warning("RADIUS Attribute Class contains unknown role '%s'. Only roles 'staff', "
-                                    "'su-staff' and 'superuser' are allowed" % cl)
+            try:
+                cl = cl.decode("utf-8")
+                if cl.lower().find(group_class_prefix) == 0:
+                    groups.append(cl[len(group_class_prefix):])
+                elif cl.lower().find(role_class_prefix) == 0:
+                    role = cl[len(role_class_prefix):]
+                    if role == "staff":
+                        is_staff = True
+                    elif role == "superuser":
+                        is_superuser = True
+                    # Passing "su-staff" through the Class attribute from the RADIUS server
+                    # will set both staff and superuser to true for the user.
+                    elif role == "su-staff":
+                        is_staff = True
+                        is_superuser = True
+                    else:
+                        logging.warning("RADIUS Attribute Class contains unknown role '%s'. Only roles 'staff', "
+                                        "'su-staff' and 'superuser' are allowed" % cl)
+            except UnicodeDecodeError:
+                logging.warning("RADIUS Attribute Class contains non-unicode value '%s'. Only unicode values are "
+                                "supported" % cl)
         return groups, is_staff, is_superuser
 
     def _radius_auth(self, server, username, password):
