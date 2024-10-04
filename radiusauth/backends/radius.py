@@ -155,8 +155,12 @@ class RADIUSBackend(object):
                     is_staff = True
                 elif role == "superuser":
                     is_superuser = True
+                elif role == "su-staff":
+                    # su-staff role assignment sets both is_staff and is_superuser to True for the user in one step.
+                    is_staff = True
+                    is_superuser = True
                 else:
-                    logging.warning("RADIUS Attribute Class contains unknown role '%s'. Only roles 'staff' and 'superuser' are allowed" % cl)
+                    logging.warning("RADIUS Attribute Class contains unknown role '%s'. Only roles 'staff', 'superuser' and 'su-staff' are allowed" % cl)
         return groups, is_staff, is_superuser
 
     def _radius_auth(self, server, username, password):
