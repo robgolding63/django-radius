@@ -201,7 +201,17 @@ class RADIUSBackend(object):
             user.set_password(password)
 
         user.save()
-        user.groups.set(groups)
+
+        # If RADIUS_IMPORT_GROUPS is not set, configure it to default value False
+        # False means that a user import from RADIUS to Django will NOT overwrite the group
+        # assignment of the user.
+        # The default is TRUE to mimic django-radius's current behavior pre-PR.
+        if not hasattr(settings, "RADIUS_IMPORT_GROUPS"):
+            settings.RADIUS_IMPORT_GROUPS = True
+
+        if settings.RADIUS_IMPORT_GROUPS:
+            user.groups.set(groups)
+
         return user
 
     def get_user_groups(self, group_names):
